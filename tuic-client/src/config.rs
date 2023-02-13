@@ -30,6 +30,7 @@ Arguments:
 pub struct Config {
     pub relay: Relay,
     pub local: Local,
+    pub proxy: Tproxy,
     #[serde(default = "default::log_level")]
     pub log_level: LevelFilter,
 }
@@ -81,6 +82,12 @@ pub struct Local {
     pub dual_stack: Option<bool>,
     #[serde(default = "default::local::max_packet_size")]
     pub max_packet_size: usize,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Tproxy {
+    pub server: SocketAddr,
 }
 
 impl Config {

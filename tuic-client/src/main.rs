@@ -2,6 +2,7 @@ use self::{
     config::{Config, ConfigError},
     connection::Endpoint,
     socks5::Server as Socks5Server,
+    tproxy::TproxyServer,
 };
 use env_logger::Builder as LoggerBuilder;
 use quinn::{ConnectError, ConnectionError};
@@ -13,6 +14,7 @@ use webpki::Error as WebpkiError;
 mod config;
 mod connection;
 mod socks5;
+mod tproxy;
 mod utils;
 
 #[tokio::main]
