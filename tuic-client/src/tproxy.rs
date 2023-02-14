@@ -16,6 +16,7 @@ use std::{
 use tokio::{
     io::{self, AsyncWriteExt},
     net::{TcpListener, UdpSocket},
+    select,
 };
 use tokio_util::compat::FuturesAsyncReadCompatExt;
 use tuic::Address as TuicAddress;
@@ -25,6 +26,7 @@ static TPROXY_SERVER: OnceCell<TproxyServer> = OnceCell::new();
 pub struct TproxyServer {
     tcp_listen: TcpListener,
     udp_socket: UdpSocket,
+    addr: SocketAddr,
 }
 
 impl TproxyServer {
@@ -36,7 +38,7 @@ impl TproxyServer {
 
         let tcp_socket = {
             let socket = Socket::new(domain, Type::STREAM, Some(Protocol::TCP))?;
-
+            socket.set_ip_transparent(true);
             socket.set_reuse_address(true)?;
             socket.bind(&SockAddr::from(cfg.server))?;
             socket.listen(128)?;
@@ -45,6 +47,7 @@ impl TproxyServer {
 
         let udp_socket = {
             let socket = Socket::new(domain, Type::DGRAM, Some(Protocol::UDP))?;
+            socket.set_ip_transparent(true);
             socket.set_reuse_address(true)?;
             socket.bind(&SockAddr::from(cfg.server))?;
             UdpSocket::from_std(StdUdpSocket::from(socket))?
@@ -53,6 +56,7 @@ impl TproxyServer {
         let server = Self {
             tcp_listen: tcp_socket,
             udp_socket: udp_socket,
+            addr: cfg.server,
         };
 
         TPROXY_SERVER
@@ -65,6 +69,11 @@ impl TproxyServer {
 
     pub async fn start(){
         let server = TPROXY_SERVER.get().unwrap();
-        
+        log::warn!("[tproxy] server started, listening on {}", server.addr);
+
+        tokio::spawn(future)
+        loop {
+            select!
+        }
     }
 }
